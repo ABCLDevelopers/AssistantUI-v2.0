@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.chris.assistantui10.ChatBoard"
+    android:padding="15dp"
+    android:fitsSystemWindows="true"
+    android:background="@drawable/drawable_gradient_animation_list"
+    android:id="@+id/root_layout"
+    android:orientation="vertical">
+    <com.github.bassaer.chatmessageview.views.ChatView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="25dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/chat_view"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="75dp"
+        android:layout_marginRight="20dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        app:backgroundTint="@color/colorRed_A400"
+        app:elevation="@dimen/font_normal"
+        app:fabSize="normal"
+        app:srcCompat="@android:drawable/ic_btn_speak_now" />
+
+</RelativeLayout>

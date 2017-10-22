@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@android:color/background_dark">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="110dp"
+        android:id="@+id/start"
+        android:background="@drawable/button_shape"
+        android:layout_centerInParent="true"
+        android:text=" Let's get started "
+        android:textColor="@android:color/white"
+        android:textAllCaps="false"/>
+
+</RelativeLayout>
