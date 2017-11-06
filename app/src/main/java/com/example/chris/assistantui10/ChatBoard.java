@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,19 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
+import ai.api.AIListener;
+import ai.api.AIServiceException;
+import ai.api.android.AIConfiguration;
+import ai.api.android.AIDataService;
+import ai.api.android.AIService;
+import ai.api.model.AIError;
+import ai.api.model.AIRequest;
+import ai.api.model.AIResponse;
+import ai.api.model.Result;
+
+import com.github.bassaer.chatmessageview.utils.ChatBot;
+import com.google.gson.JsonElement;
+import java.util.Map;
 
 import com.github.bassaer.chatmessageview.models.Message;
 import com.github.bassaer.chatmessageview.models.User;
@@ -25,7 +39,8 @@ import com.github.bassaer.chatmessageview.views.ChatView;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ChatBoard extends AppCompatActivity {
+public class ChatBoard extends AppCompatActivity  {
+    private AIService aiService;
     public static final String EXTRA_CIRCULAR_REVEAL_X = "EXTRA_CIRCULAR_REVEAL_X";
     public static final String EXTRA_CIRCULAR_REVEAL_Y = "EXTRA_CIRCULAR_REVEAL_Y";
     View rootLayout;
@@ -72,6 +87,11 @@ public class ChatBoard extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(2000);
         mic=(FloatingActionButton)findViewById(R.id.floatingActionButton);
         mic.bringToFront();
+        final AIConfiguration config = new AIConfiguration("5d028f25c2f94ee688c7b3381cd83eb5",
+                AIConfiguration.SupportedLanguages.English,
+                AIConfiguration.RecognitionEngine.System);
+
+        final ai.api.AIDataService aiDataService = new ai.api.AIDataService(config);
 
         Bitmap botIcon= BitmapFactory. decodeResource(getResources(),R.drawable.bot);
         int botId=1;
@@ -102,14 +122,39 @@ public class ChatBoard extends AppCompatActivity {
                         .setMessageText(mChatView.getInputText())
                         .hideIcon(false)
                         .build();
+                String userq=mChatView.getInputText();
                 mChatView.send(message);
                 mChatView.setInputText("");
-                final Message receivedMessage = new Message.Builder()
-                        .setUser(bot)
-                        .setRightMessage(false)
-                        .setMessageText("Me have no brain me dumb :|")
-                        .build();
-                mChatView.receive(receivedMessage);
+                final AIRequest aiRequest = new AIRequest();
+                aiRequest.setQuery(userq);
+                new AsyncTask<AIRequest, Void, AIResponse>() {
+                    @Override
+                    protected AIResponse doInBackground(AIRequest... requests) {
+                        final AIRequest request = requests[0];
+                        try {
+                            final AIResponse response = aiDataService.request(aiRequest);
+                            return response;
+                        } catch (AIServiceException e) {
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(AIResponse aiResponse) {
+                        if (aiResponse != null) {
+                            final Result result = aiResponse.getResult();
+                            final String speech = result.getFulfillment().getSpeech();
+                            final Message receivedMessage = new Message.Builder()
+                                    .setUser(you)
+                                    .setRightMessage(false)
+                                    .setMessageText(speech)
+                                    .build();
+                            mChatView.receive(receivedMessage);
+
+
+
+                        }
+                    }
+                }.execute(aiRequest);
 
             }});
 
@@ -137,6 +182,10 @@ public class ChatBoard extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        final AIConfiguration config = new AIConfiguration("5d028f25c2f94ee688c7b3381cd83eb5",
+                AIConfiguration.SupportedLanguages.English,
+                AIConfiguration.RecognitionEngine.System);
+        final ai.api.AIDataService aiDataService = new ai.api.AIDataService(config);
 
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
@@ -149,12 +198,37 @@ public class ChatBoard extends AppCompatActivity {
                             .hideIcon(false)
                             .build();
                     mChatView.send(message);
-                    final Message receivedMessage = new Message.Builder()
-                            .setUser(bot1)
-                            .setRightMessage(false)
-                            .setMessageText("Me have no brain me dumb :|")
-                            .build();
-                    mChatView.receive(receivedMessage);
+                    String userq=result.get(0);
+                    final AIRequest aiRequest = new AIRequest();
+                    aiRequest.setQuery(userq);
+                    new AsyncTask<AIRequest, Void, AIResponse>() {
+                        @Override
+                        protected AIResponse doInBackground(AIRequest... requests) {
+                            final AIRequest request = requests[0];
+                            try {
+                                final AIResponse response = aiDataService.request(aiRequest);
+                                return response;
+                            } catch (AIServiceException e) {
+                            }
+                            return null;
+                        }
+                        @Override
+                        protected void onPostExecute(AIResponse aiResponse) {
+                            if (aiResponse != null) {
+                                final Result result = aiResponse.getResult();
+                                final String speech = result.getFulfillment().getSpeech();
+                                final Message receivedMessage = new Message.Builder()
+                                        .setUser(bot1)
+                                        .setRightMessage(false)
+                                        .setMessageText(speech)
+                                        .build();
+                                mChatView.receive(receivedMessage);
+
+
+
+                            }
+                        }
+                    }.execute(aiRequest);
                 }
                 break;
             }
