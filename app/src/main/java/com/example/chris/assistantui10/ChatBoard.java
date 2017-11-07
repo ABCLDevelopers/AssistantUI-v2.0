@@ -144,7 +144,7 @@ public class ChatBoard extends AppCompatActivity  {
                             final Result result = aiResponse.getResult();
                             final String speech = result.getFulfillment().getSpeech();
                             final Message receivedMessage = new Message.Builder()
-                                    .setUser(you)
+                                    .setUser(bot)
                                     .setRightMessage(false)
                                     .setMessageText(speech)
                                     .build();
