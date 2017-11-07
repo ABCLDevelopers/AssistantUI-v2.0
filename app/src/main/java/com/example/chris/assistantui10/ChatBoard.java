@@ -2,22 +2,30 @@ package com.example.chris.assistantui10;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.AlarmClock;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.Toast;
+
 import ai.api.AIListener;
 import ai.api.AIServiceException;
 import ai.api.android.AIConfiguration;
@@ -30,6 +38,8 @@ import ai.api.model.Result;
 
 import com.github.bassaer.chatmessageview.utils.ChatBot;
 import com.google.gson.JsonElement;
+
+import java.util.HashMap;
 import java.util.Map;
 
 import com.github.bassaer.chatmessageview.models.Message;
@@ -149,7 +159,58 @@ public class ChatBoard extends AppCompatActivity  {
                                     .setMessageText(speech)
                                     .build();
                             mChatView.receive(receivedMessage);
+                            String Action=aiResponse.getResult().getAction();
+                            Log.d("Action",Action);
+                            if(Action.contentEquals("alarm.set")) {
+                                String time;
+                                time = aiResponse.getResult().getStringParameter("time");
+                                Log.d("Time", time);
+                                String[] tx=time.split(":");
+                                Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
+                                i.putExtra(AlarmClock.EXTRA_HOUR, Integer.parseInt(tx[0]));
+                                i.putExtra(AlarmClock.EXTRA_MINUTES,Integer.parseInt(tx[1]));
+                                startActivity(i);
+                                Toast.makeText(getApplicationContext(),"Set the alarm for 9",Toast.LENGTH_SHORT).show();
 
+                            }
+                            if(Action.contentEquals("device.settings.on"))
+                            {
+                                String module=aiResponse.getResult().getStringParameter("module");
+                                if(module.contentEquals("wifi"))
+                                {
+                                    WifiManager wf=(WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                    wf.setWifiEnabled(true);
+                                    Toast.makeText(getApplicationContext(),"turning on wifi",Toast.LENGTH_SHORT).show();
+                                }
+                                if(module.contentEquals("bluetooth"))
+                                {
+                                    BluetoothAdapter bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
+                                    if(!bluetoothAdapter.isEnabled())
+                                     bluetoothAdapter.enable();
+                                    Toast.makeText(getApplicationContext(),"turning on bluetooth",Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            }
+                            if(Action.contentEquals("device.settings.off"))
+                            {
+                                String module=aiResponse.getResult().getStringParameter("module");
+                                if(module.contentEquals("wifi"))
+                                {
+                                    WifiManager wf=(WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                    wf.setWifiEnabled(false);
+                                    Toast.makeText(getApplicationContext(),"turning off wifi",Toast.LENGTH_SHORT).show();
+                                }
+                                if(module.contentEquals("bluetooth"))
+                                {
+                                    BluetoothAdapter bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
+                                    if(bluetoothAdapter.isEnabled())
+                                        bluetoothAdapter.disable();
+                                    Toast.makeText(getApplicationContext(),"turning off bluetooth",Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            }
 
 
                         }
@@ -223,6 +284,58 @@ public class ChatBoard extends AppCompatActivity  {
                                         .setMessageText(speech)
                                         .build();
                                 mChatView.receive(receivedMessage);
+                                String Action=aiResponse.getResult().getAction();
+                                Log.d("Action",Action);
+                                if(Action.contentEquals("alarm.set")) {
+                                    String time;
+                                    time = aiResponse.getResult().getStringParameter("time");
+                                    Log.d("Time", time);
+                                    String[] tx=time.split(":");
+                                    Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
+                                    i.putExtra(AlarmClock.EXTRA_HOUR, Integer.parseInt(tx[0]));
+                                    i.putExtra(AlarmClock.EXTRA_MINUTES,Integer.parseInt(tx[1]));
+                                    startActivity(i);
+                                    Toast.makeText(getApplicationContext(),"Set the alarm for 9",Toast.LENGTH_SHORT).show();
+
+                                }
+                                if(Action.contentEquals("device.settings.on"))
+                                {
+                                    String module=aiResponse.getResult().getStringParameter("module");
+                                    if(module.contentEquals("wifi"))
+                                    {
+                                        WifiManager wf=(WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        wf.setWifiEnabled(true);
+                                        Toast.makeText(getApplicationContext(),"turning on wifi",Toast.LENGTH_SHORT).show();
+                                    }
+                                    if(module.contentEquals("bluetooth"))
+                                    {
+                                        BluetoothAdapter bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
+                                        if(!bluetoothAdapter.isEnabled())
+                                            bluetoothAdapter.enable();
+                                        Toast.makeText(getApplicationContext(),"turning on bluetooth",Toast.LENGTH_SHORT).show();
+
+                                    }
+
+                                }
+                                if(Action.contentEquals("device.settings.off"))
+                                {
+                                    String module=aiResponse.getResult().getStringParameter("module");
+                                    if(module.contentEquals("wifi"))
+                                    {
+                                        WifiManager wf=(WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        wf.setWifiEnabled(false);
+                                        Toast.makeText(getApplicationContext(),"turning off wifi",Toast.LENGTH_SHORT).show();
+                                    }
+                                    if(module.contentEquals("bluetooth"))
+                                    {
+                                        BluetoothAdapter bluetoothAdapter= BluetoothAdapter.getDefaultAdapter();
+                                        if(bluetoothAdapter.isEnabled())
+                                            bluetoothAdapter.disable();
+                                        Toast.makeText(getApplicationContext(),"turning off bluetooth",Toast.LENGTH_SHORT).show();
+
+                                    }
+
+                                }
 
 
 
